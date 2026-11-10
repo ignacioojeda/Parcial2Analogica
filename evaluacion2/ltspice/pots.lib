@@ -1,0 +1,17 @@
+* Potenciometros para LTspice
+* pos = posicion del eje (0..1). pos=1 -> cursor (W) en el pin 1; pos=0 -> cursor en el pin 3.
+* potlog: curva audio/logaritmica tipo "A" (10% de la resistencia a mitad de giro): f = (81^pos-1)/80
+* potlin: curva lineal tipo "B"
+.subckt potlog 1 W 3 params: R=50k pos=0.5
+R1 1 W {max(R*(1-(pow(81,pos)-1)/80), 0.5)}
+R2 W 3 {max(R*(pow(81,pos)-1)/80, 0.5)}
+.ends potlog
+.subckt potlin 1 W 3 params: R=1k pos=0.5
+R1 1 W {max(R*(1-pos), 0.5)}
+R2 W 3 {max(R*pos, 0.5)}
+.ends potlin
+* Interruptor de 1 polo 2 tiros (mitad de un DPDT). pos=0 -> COM-A cerrado; pos=1 -> COM-B cerrado
+.subckt spdt COM A B params: pos=0
+RA COM A {if(pos<0.5, 1m, 1G)}
+RB COM B {if(pos<0.5, 1G, 1m)}
+.ends spdt
